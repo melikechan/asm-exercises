@@ -7,49 +7,47 @@ section .text
     global _start
 
 itoa:
-    mov ecx, 10
-    xor edi, edi
-    xor edx, edx
+    mov rcx, 10
+    xor rdx, rdx
+    xor r8, r8
 
     div_loop:
-        xor edx, edx
-        div ecx
+        xor rdx, rdx
+        div rcx
         add dl, '0'
         push dx
-        inc edi
-        test eax, eax
+        inc r8
+        test rax, rax
         jnz div_loop
 
-        mov ecx, edi
-        lea edi, [buffer]
-    
+        lea rsi, [buffer]
+        
     pop_loop:
         pop dx
-        mov [edi], dl
-        inc edi
-        loop pop_loop
+        mov [rsi], dl
+        inc rsi
+        dec r8
+        jnz pop_loop
 
-
-    mov byte [edi], 0
+    mov byte [rsi], 0
     ret
 
 _start:
-    mov eax, 4
-    mov ebx, 1
-    mov ecx, msg
-    mov edx, 24
-    int 0x80
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, msg
+    mov rdx, 24
+    syscall
 
-    mov eax, meaning_of_life
-    lea ebx, [buffer]
+    movzx rax, byte [meaning_of_life]
     call itoa
 
-    mov eax, 4
-    mov ebx, 1
-    mov ecx, buffer
-    mov edx, 2
-    int 0x80
+    mov rax, 1
+    mov rdi, 1
+    lea rsi, [buffer]
+    mov rdx, 2
+    syscall
 
-    mov eax, 1
-    mov ebx, 0
-    int 0x80
+    mov rax, 60
+    xor rdi, rdi
+    syscall
